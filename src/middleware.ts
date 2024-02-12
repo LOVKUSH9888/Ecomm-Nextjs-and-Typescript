@@ -1,6 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  const isPublicRoute = ["/auth/login", "/auth/register"].includes(
+    request.nextUrl.pathname || ""
+  );
+
+  const token =
+    request.cookies.get("process.env.SECRET_KEY_COOKIE!")?.value || "";
+
+  if (!token && !isPublicRoute) {
+    return NextResponse.redirect("/auth/login");
+  }
+
+  if (token && isPublicRoute) {
+    return NextResponse.redirect("/");
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ["/auth/login", "/auth/register", "/"],
+};
+
+//Complicated code i wrote before
+/*import { NextRequest, NextResponse } from "next/server";
+
+export async function middleware(request: NextRequest) {
   let isPublicRoute = false;
   if (
     request.nextUrl.pathname === "/auth/login" ||
@@ -26,4 +52,4 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: ["/auth/login", "/auth/register", "/"],
-};
+}; */
