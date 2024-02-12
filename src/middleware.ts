@@ -9,10 +9,17 @@ export async function middleware(request: NextRequest) {
     request.cookies.get("process.env.SECRET_KEY_COOKIE!")?.value || "";
 
   if (!token && !isPublicRoute) {
-    return NextResponse.redirect("/auth/login");
+    // Construct an absolute URL for the login page = As the when I give the provided url it given the error
+    /*Here, we're using the URL constructor to create a new URL object. The constructor takes two parameters:
+
+"/auth/login": This is the path we want to append to the base URL.
+request.url: This is the base URL. We use request.url to ensure that the new URL inherits the protocol, host, and other information from the current request. */
+    const loginUrl = new URL("/auth/login", request.url);
+    return NextResponse.redirect(loginUrl.href);
   }
 
   if (token && isPublicRoute) {
+    // Redirect to the home page for authenticated users
     return NextResponse.redirect("/");
   }
 
